@@ -5,15 +5,16 @@ export default function Home(){
 const [result, setResult]=useState("");
 const [topic,setTopic]=useState("")
 const [category,setCategory]=useState("Coding");
-const [tone,setTone]=useState("Inspirational")
+const [tone,setTone]=useState("Inspirational");
+const [isLoading,setIsLoading]=useState(false);
 
 const testAI=async()=>{
-
- 
-  setResult("Crafting your quote...");
+  setIsLoading(true);
+  setResult("");
   setTimeout(() => {
     setResult(`The soul of ${topic || "coding"} is found in the details of the journey.`);
-  }, 1000);
+    setIsLoading(false);
+  }, 2000);
 
   /*const res=await fetch("/api/generate",{
     method:"Post",
@@ -69,14 +70,36 @@ return(
         </select>
       </div>
 
+      {/* --- Generate Button --- */}
       <button 
         onClick={testAI}
-        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        disabled={isLoading}
+        className={`mt-4 px-4 py-2 text-white rounded transition-colors ${
+        isLoading ? "bg-gray-600 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"
+        }`}
       >
-        Generate Quote
+        {isLoading ? "Generating..." : "Generate Quote"}
       </button>
-      {result && <p className="mt-8 italic text-center text-lg">"{result}"</p>}
-    </main>
+      {/* --- Loading Placeholder --- */}
+      {isLoading && (
+        <div className="mt-10 p-8 max-w-lg w-full bg-[#111111] border-2 border-gray-700 rounded-2xl animate-pulse text-center">
+          <p className="text-gray-500 italic text-lg font-serif">Thinking of a masterpiece...</p>
+        </div>
+      )}
+      {/* --- Quote Card --- */}
+      {!isLoading && result && (
+        <div className="mt-10 p-8 max-w-lg bg-[#111111] border-2 border-purple-400 rounded-2xl shadow-xl text-center transform transition-all animate-in fade-in zoom-in duration-500">
+          <p className="italic text-lg font-serif leading-relaxed text-gray-100">"{result}"</p>
 
-)
+
+          <div className="mt-6 pt-4 border-t border-gray-500 flex justify-center gap-4 text-[10px] uppercase tracking-widest text-gray-500 font-medium">
+            <span className="bg-gray-900 border border-gray-700 px-2 py-1 rounded">{category}</span>
+            <span className="text-gray-700">•</span>
+            <span className="bg-gray-900 border border-gray-700 px-2 py-1 rounded">{tone}</span>
+          </div>
+        </div>
+      )
+      }
+    </main>
+    )
 }
