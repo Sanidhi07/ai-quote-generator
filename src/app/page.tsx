@@ -13,12 +13,17 @@ const testAI=async()=>{
   setIsLoading(true);
   setResult("");
   setError("");
+
+  // Construct the dynamic prompt
+  const dynamicPrompt = `Give me a ${tone} quote about ${topic || "Life"} in the category of ${category}.`;
+  console.log("Generated Prompt:", dynamicPrompt);
   try{
     
     await new Promise((resolve) => setTimeout(resolve, 2000));
     // throw new Error("Simulated API failure");
     
-    setResult(`The soul of ${topic || "coding"} is found in the details of the journey.`);
+    // Using the dynamic data in our mock result to verify it works
+    setResult(`[${tone} ${category} Quote]: The essence of ${topic || "the journey"} lies in the character we build.`);
   } catch (err) {
     setError("Failed to generate quote. Please try again.");
   } finally {
