@@ -7,14 +7,23 @@ const [topic,setTopic]=useState("")
 const [category,setCategory]=useState("Coding");
 const [tone,setTone]=useState("Inspirational");
 const [isLoading,setIsLoading]=useState(false);
+const [error,setError]=useState("");
 
 const testAI=async()=>{
   setIsLoading(true);
   setResult("");
-  setTimeout(() => {
+  setError("");
+  try{
+    
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    // throw new Error("Simulated API failure");
+    
     setResult(`The soul of ${topic || "coding"} is found in the details of the journey.`);
+  } catch (err) {
+    setError("Failed to generate quote. Please try again.");
+  } finally {
     setIsLoading(false);
-  }, 2000);
+  }
 
   /*const res=await fetch("/api/generate",{
     method:"Post",
@@ -28,10 +37,12 @@ const testAI=async()=>{
   const data=await res.json();
    console.log("AI Data:", data);
   setResult(data.text || data.error);*/
+
 };
 return(
   <main className="flex min-h-screen flex-col items-center justify-center p-24">
       <h1 className="text-3xl font-bold">AI Quote Generator</h1>
+
       {/* --- Topic Input --- */}
       <input type="text"
       placeholder="Enter a topic (e.g Coding)"
@@ -55,6 +66,7 @@ return(
         </select>
 
       </div>
+
       {/* --- Tone Selector --- */}
       <div className="flex flex-col gap-2 mt-4">
         <label className="text-sm font-semibold text-white">Select Tone:</label>
@@ -80,12 +92,21 @@ return(
       >
         {isLoading ? "Generating..." : "Generate Quote"}
       </button>
+
+      {/* --- Error Message --- */}
+      {error && (
+        <div className="mt-4 p-3 bg-red-900/30 border border-red-500 text-red-200 rounded-lg text-sm">
+        {error}
+        </div>
+    )}
+
       {/* --- Loading Placeholder --- */}
       {isLoading && (
         <div className="mt-10 p-8 max-w-lg w-full bg-[#111111] border-2 border-gray-700 rounded-2xl animate-pulse text-center">
           <p className="text-gray-500 italic text-lg font-serif">Thinking of a masterpiece...</p>
         </div>
       )}
+
       {/* --- Quote Card --- */}
       {!isLoading && result && (
         <div className="mt-10 p-8 max-w-lg bg-[#111111] border-2 border-purple-400 rounded-2xl shadow-xl text-center transform transition-all animate-in fade-in zoom-in duration-500">
