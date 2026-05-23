@@ -10,17 +10,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Prompt is required." }, { status: 400 });
     }
 
-    const result = await model.generateContent(prompt);
-
-    const response=await result.response;
-    const text=response.text();
+   const result = await model.generateContent(prompt);
+   const text = result.response.text();
     
     return NextResponse.json({text: text});
   } catch (error) {
-    console.error("AI Route Error:", error);
-    return NextResponse.json(
-      { error: "Unable to generate content." },
-      { status: 500 }
-    );
-  }
+  console.error("FULL ERROR:", error);
+
+  return NextResponse.json(
+    {
+      error: error instanceof Error ? error.message : "Unknown error",
+    },
+    { status: 500 }
+  );
+}
 }
