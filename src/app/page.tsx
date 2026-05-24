@@ -1,5 +1,5 @@
 "use client";
-import { useState,useEffect, use } from "react";
+import { useState,useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -31,6 +31,22 @@ const handleCopy = async () => {
     setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
   }
 };
+
+const handleReset=()=>{
+  setTopic("");
+  setCategory("Coding");
+  setTone("Inspirational");
+  setResult("");
+  setError("");
+};
+
+const handleRegenerate=()=>{
+  if(topic){
+    testAI();
+  }else{
+    setError("Please enter a topic to regenerate a quote.");
+  }
+}
 
 const testAI=async()=>{
   setIsLoading(true);
@@ -125,12 +141,22 @@ return(
       
 
       {/* --- Replaced with UI Button --- */}
-      <Button
+      <div className="flex gap-3 w-full max-w-sm mt-6">
+        <Button
         onClick={testAI}
         isLoading={isLoading}
-      >
+        className="flex-[2]"
+        >
         Generate Quote
-      </Button>
+        </Button>
+  
+        <Button 
+        onClick={handleReset} 
+        className="flex-1 bg-transparent border border-blue-500 text-gray-500 hover:text-white hover:bg-gray-700 hover:border-gray-500">
+        Reset
+        </Button>
+     </div>
+      
 
       {/* --- Error Message --- */}
       {error && (
@@ -151,7 +177,7 @@ return(
         <Card>
           <p className="italic text-lg font-serif leading-relaxed text-gray-100">"{result}"</p>
 
-          <div className="flex justify-center mt-6">
+          <div className="flex justify-center gap-4 mt-6">
             <button onClick={handleCopy} 
             className={`text-xs font-medium transition-all duration-200 flex items-center gap-2 px-4 py-2 rounded-full border ${
             copied 
@@ -159,6 +185,10 @@ return(
             : "border-purple-900/50 text-purple-400 hover:text-purple-300 bg-purple-900/10"
             }`}>
               {copied ? (<><span>✅</span> Copied!</>) : (<><span>📋</span> Copy to Clipboard</>)}
+            </button>
+
+            <button onClick={handleRegenerate} className="text-xs font-medium text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 px-4 py-2 rounded-full border border-gray-800 bg-gray-900/50">
+              <span>🔄</span> Regenerate
             </button>
           </div>
 
