@@ -1,10 +1,13 @@
 "use client";
-import { useState } from "react";
+import { useState,useEffect, use } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";  
 import { copyToClipboard } from "@/lib/utils";
+import QuoteHistory from "@/components/QuoteHistory";
+import { Quote } from "@/lib/types";
+import { getHistory, saveToHistory } from "@/lib/storage";
 
 
 export default function Home(){
@@ -15,6 +18,11 @@ const [tone,setTone]=useState("Inspirational");
 const [isLoading,setIsLoading]=useState(false);
 const [error,setError]=useState("");
 const [copied, setCopied] = useState(false);
+const [history, setHistory] = useState<Quote[]>([]);
+
+useEffect(() => {
+  setHistory(getHistory());
+},[]);
 
 const handleCopy = async () => {
   const success = await copyToClipboard(result);
@@ -49,6 +57,19 @@ const testAI=async()=>{
     //Set the real AI result
     if (data.text) {
       setResult(data.text);
+
+      // Save to history
+      const newQuote: Quote = {
+      id: Date.now().toString(),
+      text: data.text,
+      topic,
+      category,
+      tone,
+      timestamp: Date.now(),
+    };
+    saveToHistory(newQuote);
+    setHistory(getHistory());
+
     } else if (data.error) {
       setError(data.error);
     }
@@ -58,6 +79,8 @@ const testAI=async()=>{
   } finally {
     setIsLoading(false);
   }
+
+  
 
   
 
@@ -147,6 +170,8 @@ return(
         </Card>
       )
       }
+
+      <QuoteHistory history={history} onSelect={(text) => setResult(text)} />
     </main>
     )
 }
