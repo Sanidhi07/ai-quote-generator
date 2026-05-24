@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { copyToClipboard } from "@/lib/utils";
 import QuoteHistory from "@/components/QuoteHistory";
 import { Quote } from "@/lib/types";
-import { getHistory, saveToHistory } from "@/lib/storage";
+import { getFavorites,toggleFavorite, getHistory, saveToHistory } from "@/lib/storage";
 
 
 export default function Home(){
@@ -19,9 +19,11 @@ const [isLoading,setIsLoading]=useState(false);
 const [error,setError]=useState("");
 const [copied, setCopied] = useState(false);
 const [history, setHistory] = useState<Quote[]>([]);
+const [favorites, setFavorites] = useState<Quote[]>([]);
 
 useEffect(() => {
   setHistory(getHistory());
+  setFavorites(getFavorites());
 },[]);
 
 const handleCopy = async () => {
@@ -46,6 +48,11 @@ const handleRegenerate=()=>{
   }else{
     setError("Please enter a topic to regenerate a quote.");
   }
+}
+
+const handleToggleFavorite = (quote: Quote) => {
+  toggleFavorite(quote);
+  setFavorites(getFavorites());
 }
 
 const testAI=async()=>{
@@ -145,7 +152,7 @@ return(
         <Button
         onClick={testAI}
         isLoading={isLoading}
-        className="flex-[2]"
+        className="flex-2"
         >
         Generate Quote
         </Button>
@@ -178,6 +185,7 @@ return(
           <p className="italic text-lg font-serif leading-relaxed text-gray-100">"{result}"</p>
 
           <div className="flex justify-center gap-4 mt-6">
+            {/* Copy Button */}
             <button onClick={handleCopy} 
             className={`text-xs font-medium transition-all duration-200 flex items-center gap-2 px-4 py-2 rounded-full border ${
             copied 
@@ -187,8 +195,33 @@ return(
               {copied ? (<><span>✅</span> Copied!</>) : (<><span>📋</span> Copy to Clipboard</>)}
             </button>
 
+            {/* Regenerate Button*/}
             <button onClick={handleRegenerate} className="text-xs font-medium text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 px-4 py-2 rounded-full border border-gray-800 bg-gray-900/50">
               <span>🔄</span> Regenerate
+            </button>
+
+            {/* Favorite Button */}
+            <button onClick={()=>{
+              const currentQuote: Quote={
+                id: Date.now.toString(),
+                text:result,
+                topic,
+                category,
+                tone,
+                timestamp:Date.now(),
+              };
+              handleToggleFavorite(currentQuote);
+            }} 
+            className={`text-xs font-medium transition-all duration-200 flex items-center gap-2 px-4 py-2 rounded-full border ${
+              favorites.some(item => item.text === result)
+              ? "border-yellow-500 text-yellow-500 bg-yellow-500/10" 
+              : "border-gray-800 text-gray-400 hover:text-yellow-500 bg-gray-900/50"
+            }`}>
+              {
+              favorites.some(item => item.text === result)
+              ? (<><span>⭐</span> Unfavorite</>) 
+              : (<><span>☆</span> Favorite</>)
+              }
             </button>
           </div>
 
