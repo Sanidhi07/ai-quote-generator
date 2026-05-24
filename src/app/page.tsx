@@ -8,6 +8,7 @@ import { copyToClipboard } from "@/lib/utils";
 import QuoteHistory from "@/components/QuoteHistory";
 import { Quote } from "@/lib/types";
 import { getFavorites,toggleFavorite, getHistory, saveToHistory } from "@/lib/storage";
+import FavoritesList from "@/components/FavoritesList";
 
 
 export default function Home(){
@@ -54,62 +55,72 @@ const handleToggleFavorite = (quote: Quote) => {
   toggleFavorite(quote);
   setFavorites(getFavorites());
 }
-
-const testAI=async()=>{
+const testAI = async () => {
   setIsLoading(true);
   setResult("");
   setError("");
 
-  // Construct the dynamic prompt
-  const dynamicPrompt = `Give me a short, unique ${tone} quote about ${topic || "coding"} in the category of ${category}.`;  console.log("Generated Prompt:", dynamicPrompt);
-  try{
-    const res = await fetch("/api/generate", {
-      method: "POST", 
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ prompt: dynamicPrompt }),
-    });
+  // --- MOCK LOGIC (Active while API is on quota limit) ---
+  setTimeout(() => {
+    const mockQuotes = [
+      "The only way to do great work is to love what you do.",
+      "Logic will get you from A to B. Imagination will take you everywhere.",
+      "Code is like humor. When you have to explain it, it’s bad.",
+      "Perfection is achieved not when there is nothing more to add, but when there is nothing left to take away."
+    ];
+    const randomQuote = mockQuotes[Math.floor(Math.random() * mockQuotes.length)];
+    
+    setResult(randomQuote);
 
-    if (!res.ok) {
-      throw new Error("Failed to fetch from API");
-    }
-
-    const data = await res.json();
-
-    //Set the real AI result
-    if (data.text) {
-      setResult(data.text);
-
-      // Save to history
-      const newQuote: Quote = {
+    const newQuote: Quote = {
       id: Date.now().toString(),
-      text: data.text,
+      text: randomQuote,
       topic,
       category,
       tone,
       timestamp: Date.now(),
     };
+
     saveToHistory(newQuote);
     setHistory(getHistory());
+    setIsLoading(false);
+  }, 800); 
 
-    } else if (data.error) {
-      setError(data.error);
+  /* // --- REAL API LOGIC---
+  const dynamicPrompt = `Give me a short, unique ${tone} quote about ${topic || "coding"} in the category of ${category}.`;
+  try {
+    const res = await fetch("/api/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: dynamicPrompt }),
+    });
+
+    if (!res.ok) {
+      if (res.status === 429) throw new Error("API Limit reached. Try again later.");
+      throw new Error("Failed to fetch from API");
     }
-  } catch (err) {
-    console.error("API Error:", err);
-    setError("Failed to generate quote. Please check your connection.");  
+
+    const data = await res.json();
+    if (data.text) {
+      setResult(data.text);
+      const newQuote: Quote = {
+        id: Date.now().toString(),
+        text: data.text,
+        topic, category, tone,
+        timestamp: Date.now(),
+      };
+      saveToHistory(newQuote);
+      setHistory(getHistory());
+    }
+  } catch (err: any) {
+    setError(err.message || "Something went wrong");
   } finally {
     setIsLoading(false);
   }
-
-  
-
-  
-
+  */
 };
 return(
-  <main className="flex min-h-screen flex-col items-center justify-center p-24">
+  <main className="flex min-h-screen flex-col items-center justify-start p-12 md:p-24 gap-8">
       <h1 className="text-3xl font-bold">AI Quote Generator</h1>
 
       {/* --- Replaced with UI Input --- */}
@@ -152,14 +163,14 @@ return(
         <Button
         onClick={testAI}
         isLoading={isLoading}
-        className="flex-2"
+        className="flex-[2]"
         >
         Generate Quote
         </Button>
   
         <Button 
         onClick={handleReset} 
-        className="flex-1 bg-transparent border border-blue-500 text-gray-500 hover:text-white hover:bg-gray-700 hover:border-gray-500">
+        className="flex-1 bg-transparent border border-gray-800 text-gray-500 hover:text-white hover:bg-gray-800 hover:border-gray-700 transition-all duration-300">
         Reset
         </Button>
      </div>
@@ -181,8 +192,8 @@ return(
 
    
       {!isLoading && result && (
-        <Card>
-          <p className="italic text-lg font-serif leading-relaxed text-gray-100">"{result}"</p>
+        <Card className="w-full max-w-2xl animate-in fade-in zoom-in-95 slide-in-from-bottom-2 duration-1000 ease-in-out">
+          <p className="italic text-lg font-serif leading-relaxed text-gray-100 ">"{result}"</p>
 
           <div className="flex justify-center gap-4 mt-6">
             {/* Copy Button */}
@@ -203,7 +214,7 @@ return(
             {/* Favorite Button */}
             <button onClick={()=>{
               const currentQuote: Quote={
-                id: Date.now.toString(),
+                id: Date.now().toString(),
                 text:result,
                 topic,
                 category,
@@ -235,6 +246,7 @@ return(
       }
 
       <QuoteHistory history={history} onSelect={(text) => setResult(text)} />
+      <FavoritesList favorites={favorites} onSelect={(text) => setResult(text)} onRemove={(quote) => handleToggleFavorite(quote)} />
     </main>
     )
 }
