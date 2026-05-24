@@ -15,33 +15,36 @@ const testAI=async()=>{
   setError("");
 
   // Construct the dynamic prompt
-  const dynamicPrompt = `Give me a ${tone} quote about ${topic || "Life"} in the category of ${category}.`;
-  console.log("Generated Prompt:", dynamicPrompt);
+  const dynamicPrompt = `Give me a short, unique ${tone} quote about ${topic || "coding"} in the category of ${category}.`;  console.log("Generated Prompt:", dynamicPrompt);
   try{
-    
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    // throw new Error("Simulated API failure");
-    
-    // Using the dynamic data in our mock result to verify it works
-    setResult(`[${tone} ${category} Quote]: The essence of ${topic || "the journey"} lies in the character we build.`);
+    const res = await fetch("/api/generate", {
+      method: "POST", 
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ prompt: dynamicPrompt }),
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch from API");
+    }
+
+    const data = await res.json();
+
+    //Set the real AI result
+    if (data.text) {
+      setResult(data.text);
+    } else if (data.error) {
+      setError(data.error);
+    }
   } catch (err) {
-    setError("Failed to generate quote. Please try again.");
+    console.error("API Error:", err);
+    setError("Failed to generate quote. Please check your connection.");  
   } finally {
     setIsLoading(false);
   }
 
-  /*const res=await fetch("/api/generate",{
-    method:"Post",
-      headers: {
-   "Content-Type": "application/json",
-   },
-    body:JSON.stringify({prompt:"Give me a short inspirational quote about coding."}),
-
-  });
-  console.log("Api status",res);
-  const data=await res.json();
-   console.log("AI Data:", data);
-  setResult(data.text || data.error);*/
+  
 
 };
 return(
@@ -62,7 +65,7 @@ return(
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="p-2 border border-gray-300 rounded bg-black text-shadow-white w-64 focus:ring-2 focus:ring-blue-500 outline-none"
+          className="p-2 border border-gray-300 rounded bg-black text-white w-64 focus:ring-2 focus:ring-blue-500 outline-none"
         >
           <option value="Coding">Coding</option>
           <option value="Motivation">Motivation</option>
@@ -78,7 +81,7 @@ return(
         <select
           value={tone}
           onChange={(e) => setTone(e.target.value)}
-          className="p-2 border border-gray-300 rounded bg-black text-shadow-white w-64 focus:ring-2 focus:ring-blue-500 outline-none"
+          className="p-2 border border-gray-300 rounded bg-black text-white w-64 focus:ring-2 focus:ring-blue-500 outline-none"
         >
           <option value="Inspirational">Inspirational</option>
           <option value="Motivational">Motivational</option>
