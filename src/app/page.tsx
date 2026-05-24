@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";  
+import { copyToClipboard } from "@/lib/utils";
+
 
 export default function Home(){
 const [result, setResult]=useState("");
@@ -12,6 +14,15 @@ const [category,setCategory]=useState("Coding");
 const [tone,setTone]=useState("Inspirational");
 const [isLoading,setIsLoading]=useState(false);
 const [error,setError]=useState("");
+const [copied, setCopied] = useState(false);
+
+const handleCopy = async () => {
+  const success = await copyToClipboard(result);
+  if(success){
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
+  }
+};
 
 const testAI=async()=>{
   setIsLoading(true);
@@ -116,6 +127,18 @@ return(
       {!isLoading && result && (
         <Card>
           <p className="italic text-lg font-serif leading-relaxed text-gray-100">"{result}"</p>
+
+          <div className="flex justify-center mt-6">
+            <button onClick={handleCopy} 
+            className={`text-xs font-medium transition-all duration-200 flex items-center gap-2 px-4 py-2 rounded-full border ${
+            copied 
+            ? "border-green-500 text-green-400 bg-green-500/10" 
+            : "border-purple-900/50 text-purple-400 hover:text-purple-300 bg-purple-900/10"
+            }`}>
+              {copied ? (<><span>✅</span> Copied!</>) : (<><span>📋</span> Copy to Clipboard</>)}
+            </button>
+          </div>
+
           <div className="mt-6 pt-4 border-t border-gray-500 flex justify-center gap-4 text-[10px] uppercase tracking-widest text-gray-500 font-medium">
             <span className="bg-gray-900 border border-gray-700 px-2 py-1 rounded">{category}</span>
             <span className="text-gray-700">•</span>
