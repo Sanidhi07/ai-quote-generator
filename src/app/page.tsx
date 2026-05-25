@@ -9,7 +9,7 @@ import QuoteHistory from "@/components/QuoteHistory";
 import { Quote } from "@/lib/types";
 import { getFavorites,toggleFavorite, getHistory, saveToHistory } from "@/lib/storage";
 import FavoritesList from "@/components/FavoritesList";
-
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function Home(){
 const [result, setResult]=useState("");
@@ -120,138 +120,111 @@ const testAI = async () => {
   */
 };
 return(
-  <main className="flex min-h-screen flex-col items-center justify-start p-6 md:p-24 gap-6 md:gap-8 max-w-4xl mx-auto">
-      <h1 className="text-2xl md:text-4xl font-bold text-center">AI Quote Generator</h1>
+  <main className="flex min-h-screen flex-col items-center justify-start p-6 md:p-24 gap-6 md:gap-8 max-w-4xl mx-auto transition-colors duration-300">
+    
+    {/* 2. Added the Toggle Button */}
+    <ThemeToggle />
 
-      
-
-      {/* --- Replaced with UI Input --- */}
+<h1 className="text-4xl md:text-6xl font-black text-center tracking-tight transition-all pb-2 bg-linear-to-r dark:from-indigo-400 dark:via-purple-400 dark:to-indigo-400 
+  bg-clip-text text-transparent animate-in fade-in slide-in-from-top-6 duration-1000">
+  AI Quote Generator
+</h1>
+    
       <Input
         placeholder="Enter a topic (e.g Coding)"
         value={topic}
         onChange={(e) => setTopic(e.target.value)}
-      />
+        className="shadow-sm border-slate-200 dark:border-gray-700"/>
       
-      {/* Selects Container - Stacks on mobile, side-by-side on tablet+ */}
-   
-       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
-      {/* --- Replaced with UI Selects --- */}
-      <Select
-        label="Select Category:"
-        value={category}
-        onChange={(e) => setCategory(e.target.value)}
-      >
-        <option value="Coding">Coding</option>
-        <option value="Motivation">Motivation</option>
-        <option value="Philosophy">Philosophy</option>
-        <option value="Life">Life</option>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Select
+          label="Select Category:"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="border-slate-200 dark:border-gray-800 shadow-sm"
+        >
+          <option value="Coding">Coding</option>
+          <option value="Motivation">Motivation</option>
+          <option value="Philosophy">Philosophy</option>
+          <option value="Life">Life</option>
         </Select>
 
-    
-
-      {/* --- Tone Selector --- */}
         <Select
           label="Select Tone:"
           value={tone}
           onChange={(e) => setTone(e.target.value)}
+          className="border-slate-200 dark:border-gray-800 shadow-sm"
         >
           <option value="Inspirational">Inspirational</option>
           <option value="Motivational">Motivational</option>
           <option value="Philosophical">Philosophical</option>
           <option value="Humorous">Humorous</option>
         </Select>
-        </div>
-     
+      </div>
+    
 
-      {/* --- Replaced with UI Button --- */}
-      <div className="flex flex-col md:flex-row gap-3 w-full max-w-sm px-5 mt-6 ">
-        <Button
+    {/* 4. Refined Button Container spacing */}
+    <div className="flex flex-col md:flex-row gap-3 w-full max-w-sm mt-6">
+      <Button
         onClick={testAI}
         isLoading={isLoading}
-        className="flex-[2]"
-        >
+        className="bg-linear-to-r from-indigo-600 to-purple-600 hover:scale-[1.03] active:scale-[0.97] text-white font-bold shadow-lg shadow-indigo-200 dark:shadow-none transition-all duration-300"
+      >
         Generate Quote
-        </Button>
-  
-        <Button 
-        onClick={handleReset} 
-        className="flex-1 bg-transparent border border-gray-800 text-gray-500 hover:text-white hover:bg-gray-800 hover:border-gray-700 transition-all duration-300">
-        Reset
-        </Button>
-     </div>
-      
+      </Button>
 
-      {/* --- Error Message --- */}
-      {error && (
-        <div className="mt-4 p-3 bg-red-900/30 border border-red-500 text-red-200 rounded-lg text-sm">
-        {error}
+      <Button 
+        onClick={handleReset} 
+        className="flex-1 bg-white dark:bg-transparent border border-slate-200 dark:border-gray-800 text-slate-600 dark:text-gray-400  hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
+      >
+        Reset
+      </Button>
+    </div>
+
+    {/* 5. Quote Card Colors */}
+    {!isLoading && result && (
+      <Card className="w-full max-w-2xl border-slate-100 dark:border-gray-700 bg-white dark:bg-gray-950 shadow-xl shadow-slate-200/60 dark:shadow-none animate-in fade-in zoom-in-95 duration-1000">
+        <p className="italic text-xl font-serif leading-relaxed text-slate-800 dark:text-gray-100 text-center">
+          "{result}"
+        </p>
+
+       <div className="flex flex-wrap justify-center gap-4 mt-6">
+          <button onClick={handleCopy} 
+            className={`text-xs font-bold transition-all duration-200 flex items-center gap-2 px-5 py-2.5 rounded-full border ${
+              copied 
+              ? "border-green-500 text-green-600 bg-green-50" 
+              : "border-indigo-100 dark:border-purple-900/50 text-indigo-600 dark:text-purple-400 bg-indigo-50 dark:bg-purple-900/10 hover:bg-indigo-100"
+            }`}>
+            {copied ? "✅ Copied!" : "📋 Copy"}
+          </button>
+          
+          
+          <button onClick={handleRegenerate}
+            className="text-xs font-bold transition-all duration-200 flex items-center gap-2 px-5 py-2.5 rounded-full border border-blue-100 dark:border-blue-900/50 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/10 hover:bg-blue-100">
+            🔄 Regenerate
+          </button>  
+
+        <button onClick={() => handleToggleFavorite({
+            id: Date.now().toString(),
+            text: result,   
+            topic,
+            category,
+            tone,
+            timestamp: Date.now(),
+          })} 
+            className={`text-xs font-bold transition-all duration-200 flex items-center gap-2 px-5 py-2.5 rounded-full border ${favorites.some(fav => fav.text === result) 
+              ? "border-amber-400 text-amber-600 bg-amber-50" 
+              : "border-slate-200 dark:border-gray-700 text-slate-500 dark:text-gray-400 bg-slate-50 dark:bg-gray-900/10 hover:bg-slate-100"      
+            }`}>
+            {favorites.some(fav => fav.text === result) ? "⭐ Unfavorite" : "☆ Favorite"}
+          </button>
         </div>
+      </Card>
     )}
 
-      {/* --- Replaced with UI Card --- */}
-      {isLoading && (
-        <Card className="border-gray-700 animate-pulse">
-          <p className="text-gray-500 italic text-lg font-serif">Thinking of a masterpiece...</p>
-        </Card>
-      )}
-
-   
-      {!isLoading && result && (
-        <Card className="w-full max-w-2xl animate-in fade-in zoom-in-95 slide-in-from-bottom-2 duration-1000 ease-in-out">
-          <p className="italic text-lg font-serif leading-relaxed text-gray-100 ">"{result}"</p>
-
-          <div className="flex justify-center gap-4 mt-6">
-            {/* Copy Button */}
-            <button onClick={handleCopy} 
-            className={`text-xs font-medium transition-all duration-200 flex items-center gap-2 px-4 py-2 rounded-full border ${
-            copied 
-            ? "border-green-500 text-green-400 bg-green-500/10" 
-            : "border-purple-900/50 text-purple-400 hover:text-purple-300 bg-purple-900/10"
-            }`}>
-              {copied ? (<><span>✅</span> Copied!</>) : (<><span>📋</span> Copy to Clipboard</>)}
-            </button>
-
-            {/* Regenerate Button*/}
-            <button onClick={handleRegenerate} className="text-xs font-medium text-gray-400 hover:text-purple-400 transition-colors flex items-center gap-2 px-4 py-2 rounded-full border border-gray-800 bg-gray-900/50">
-              <span>🔄</span> Regenerate
-            </button>
-
-            {/* Favorite Button */}
-            <button onClick={()=>{
-              const currentQuote: Quote={
-                id: Date.now().toString(),
-                text:result,
-                topic,
-                category,
-                tone,
-                timestamp:Date.now(),
-              };
-              handleToggleFavorite(currentQuote);
-            }} 
-            className={`text-xs font-medium transition-all duration-200 flex items-center gap-2 px-4 py-2 rounded-full border ${
-              favorites.some(item => item.text === result)
-              ? "border-yellow-500 text-yellow-500 bg-yellow-500/10" 
-              : "border-gray-800 text-gray-400 hover:text-yellow-500 bg-gray-900/50"
-            }`}>
-              {
-              favorites.some(item => item.text === result)
-              ? (<><span>⭐</span> Unfavorite</>) 
-              : (<><span>☆</span> Favorite</>)
-              }
-            </button>
-          </div>
-
-          <div className="mt-6 pt-4 border-t border-gray-500 flex justify-center gap-4 text-[10px] uppercase tracking-widest text-gray-500 font-medium">
-            <span className="bg-gray-900 border border-gray-700 px-2 py-1 rounded">{category}</span>
-            <span className="text-gray-700">•</span>
-            <span className="bg-gray-900 border border-gray-700 px-2 py-1 rounded">{tone}</span>
-          </div>
-        </Card>
-      )
-      }
-
-      <QuoteHistory history={history} onSelect={(text) => setResult(text)} />
-      <FavoritesList favorites={favorites} onSelect={(text) => setResult(text)} onRemove={(quote) => handleToggleFavorite(quote)} />
-    </main>
-    )
+   <QuoteHistory history={history} onSelect={(text) => setResult(text)} />
+    <FavoritesList favorites={favorites} onSelect={(text) => setResult(text)} onRemove={handleToggleFavorite} />
+  </main>
+);
+    
 }
