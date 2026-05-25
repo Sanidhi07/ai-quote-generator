@@ -11,7 +11,7 @@ export default function FavoritesList({favorites, onSelect, onRemove}: Favorites
   if(favorites.length === 0) return null;
 
   return (
-    <div className="mt-12 w-full max-w-4xl border-t border-gray-800/50 pt-10">
+    <div className="mt-12 w-full max-w-md md:max-w-4xl border-t border-gray-800/50 pt-10">
       <h3 className="text-yellow-500/80 uppercase tracking-[0.3em] text-[10px] font-bold mb-8 text-center">
        {favorites.length > 0 ? "Your Collection" : "No saved gems yet"}
       </h3>

@@ -120,8 +120,10 @@ const testAI = async () => {
   */
 };
 return(
-  <main className="flex min-h-screen flex-col items-center justify-start p-12 md:p-24 gap-8">
-      <h1 className="text-3xl font-bold">AI Quote Generator</h1>
+  <main className="flex min-h-screen flex-col items-center justify-start p-6 md:p-24 gap-6 md:gap-8 max-w-4xl mx-auto">
+      <h1 className="text-2xl md:text-4xl font-bold text-center">AI Quote Generator</h1>
+
+      
 
       {/* --- Replaced with UI Input --- */}
       <Input
@@ -130,7 +132,9 @@ return(
         onChange={(e) => setTopic(e.target.value)}
       />
       
-
+      {/* Selects Container - Stacks on mobile, side-by-side on tablet+ */}
+   
+       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
       {/* --- Replaced with UI Selects --- */}
       <Select
         label="Select Category:"
@@ -156,10 +160,11 @@ return(
           <option value="Philosophical">Philosophical</option>
           <option value="Humorous">Humorous</option>
         </Select>
-      
+        </div>
+     
 
       {/* --- Replaced with UI Button --- */}
-      <div className="flex gap-3 w-full max-w-sm mt-6">
+      <div className="flex flex-col md:flex-row gap-3 w-full max-w-sm px-5 mt-6 ">
         <Button
         onClick={testAI}
         isLoading={isLoading}
