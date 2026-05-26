@@ -8,12 +8,20 @@ interface FavoritesListProps {
 }
 
 export default function FavoritesList({favorites, onSelect, onRemove}: FavoritesListProps){
-  if(favorites.length === 0) return null;
+  if (favorites.length === 0) {
+    return (
+      <div className="mt-12 flex flex-col items-center justify-center p-12 border-2 border-dashed border-slate-200 dark:border-gray-800 rounded-3xl animate-in fade-in zoom-in-95 duration-500">
+        <div className="text-4xl mb-4">✨</div>
+        <p className="text-slate-500 dark:text-gray-400 font-medium text-sm">No saved gems yet.</p>
+        <p className="text-slate-400 dark:text-gray-600 text-xs mt-1 text-center">Your favorite quotes will appear here.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="mt-2 w-full border-gray-800/50 p-2">
-      <h3 className="text-black-600 dark:text-white-600 uppercase tracking-[0.2em] text-[12px] font-bold mb-8 text-center">
-       {favorites.length > 0 ? "Your Collection" : "No saved gems yet"}
+      <h3 className="text-black dark:text-white-600 uppercase tracking-[0.2em] text-[12px] font-bold mb-8 text-center">
+        Your Collection
       </h3>
       {favorites.length > 0 &&(
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">

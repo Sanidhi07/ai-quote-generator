@@ -6,11 +6,19 @@ interface QuoteHistoryProps {
 }
 
 export default function QuoteHistory({ history, onSelect }: QuoteHistoryProps) {
-  if (history.length === 0) return null;
+ if (history.length === 0) {
+    return (
+      <div className="mt-12 flex flex-col items-center justify-center p-12 border-2 border-dashed border-slate-200 dark:border-gray-800 rounded-3xl animate-in fade-in zoom-in-95 duration-500">
+        <div className="text-4xl mb-4">✍️</div>
+        <p className="text-slate-500 dark:text-gray-400 font-medium text-sm text-center">Your history is currently empty.</p>
+        <p className="text-slate-400 dark:text-gray-600 text-xs mt-1 text-center">Generate your first quote above to get started!</p>
+      </div>
+    );
+  }
   
   return (
     <div className="mt-2 w-full animate-in fade-in slide-in-from-top-4 duration-700">
-      <h3 className="text-black-600 dark:text-white-600 uppercase tracking-[0.2em] text-[12px] font-bold mb-8 text-center">
+      <h3 className="text-black dark:text-white-600 uppercase tracking-[0.2em] text-[12px] font-bold mb-8 text-center">
         Recent Generations
       </h3>
       
