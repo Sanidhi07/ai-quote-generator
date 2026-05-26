@@ -21,6 +21,7 @@ const [error,setError]=useState("");
 const [copied, setCopied] = useState(false);
 const [history, setHistory] = useState<Quote[]>([]);
 const [favorites, setFavorites] = useState<Quote[]>([]);
+const [activeTab, setActiveTab] = useState<"history" | "favorites">("history");
 
 useEffect(() => {
   setHistory(getHistory());
@@ -60,33 +61,7 @@ const testAI = async () => {
   setResult("");
   setError("");
 
-  // --- MOCK LOGIC (Active while API is on quota limit) ---
-  setTimeout(() => {
-    const mockQuotes = [
-      "The only way to do great work is to love what you do.",
-      "Logic will get you from A to B. Imagination will take you everywhere.",
-      "Code is like humor. When you have to explain it, it’s bad.",
-      "Perfection is achieved not when there is nothing more to add, but when there is nothing left to take away."
-    ];
-    const randomQuote = mockQuotes[Math.floor(Math.random() * mockQuotes.length)];
-    
-    setResult(randomQuote);
-
-    const newQuote: Quote = {
-      id: Date.now().toString(),
-      text: randomQuote,
-      topic,
-      category,
-      tone,
-      timestamp: Date.now(),
-    };
-
-    saveToHistory(newQuote);
-    setHistory(getHistory());
-    setIsLoading(false);
-  }, 800); 
-
-  /* // --- REAL API LOGIC---
+  
   const dynamicPrompt = `Give me a short, unique ${tone} quote about ${topic || "coding"} in the category of ${category}.`;
   try {
     const res = await fetch("/api/generate", {
@@ -117,7 +92,7 @@ const testAI = async () => {
   } finally {
     setIsLoading(false);
   }
-  */
+  
 };
 return(
   <main className="flex min-h-screen flex-col items-center justify-start p-6 md:p-24 gap-6 md:gap-8 max-w-4xl mx-auto transition-colors duration-300">
@@ -168,14 +143,14 @@ return(
       <Button
         onClick={testAI}
         isLoading={isLoading}
-        className="bg-linear-to-r from-indigo-600 to-purple-600 hover:scale-[1.03] active:scale-[0.97] text-white font-bold shadow-lg shadow-indigo-200 dark:shadow-none transition-all duration-300"
+        className="flex-2 bg-linear-to-r from-indigo-600 to-purple-600 hover:scale-[1.03] active:scale-[0.97] text-white font-bold shadow-lg shadow-indigo-200 dark:shadow-none transition-all duration-300"
       >
         Generate Quote
       </Button>
 
       <Button 
         onClick={handleReset} 
-        className="flex-1 bg-white dark:bg-transparent border border-slate-200 dark:border-gray-800 text-slate-600 dark:text-gray-400  hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
+        className="flex-1 bg-gray-700 dark:bg-transparent border border-slate-200 dark:border-gray-800 text-slate-600 dark:text-gray-400  hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
       >
         Reset
       </Button>
@@ -222,8 +197,46 @@ return(
       </Card>
     )}
 
-   <QuoteHistory history={history} onSelect={(text) => setResult(text)} />
-    <FavoritesList favorites={favorites} onSelect={(text) => setResult(text)} onRemove={handleToggleFavorite} />
+  
+<div className=" bg-linear-to-r from-indigo-600 via-blue-500 to-pink-400 flex flex-col items-center w-full p-4 mt-8 rounded-2xl shadow-lg  animate-in  fade-in slide-in-from-bottom-2 duration-1000"> 
+  <div className="flex p-1 bg-slate-100 dark:bg-purple-800/30 backdrop-blur-sm rounded-2xl w-full max-w-[320px] border border-slate-200 dark:border-slate-700 shadow-inner">
+    <button
+      onClick={() => setActiveTab('history')}
+      className={`flex-1 py-2 px-4 rounded-xl text-sm font-bold transition-all duration-300 ${
+        activeTab === 'history'
+          ? 'text-white dark:bg-pink-400/30 shadow-md'
+          : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'
+      }`}
+    >
+      Recent
+    </button>
+    <button
+      onClick={() => setActiveTab('favorites')}
+      className={`flex-1 py-2 px-4 rounded-xl text-sm font-bold transition-all duration-300 ${
+        activeTab === 'favorites'
+          ? 'text-white dark:bg-pink-400/30  shadow-md'
+          : 'text-slate-500 dark:text-slate-400 hover:text-slate-700'
+      }`}
+    >
+      Collection
+    </button>
+  </div>
+
+  <div className="bg-green-500/30 w-full max-w-5xl mt-6 rounded-2xl p-2 animate-in fade-in slide-in-from-top-2 duration-500">
+    {activeTab === 'history' ? (
+      <QuoteHistory 
+        history={history} 
+        onSelect={(text) => setResult(text)} 
+      />
+    ) : (
+      <FavoritesList 
+        favorites={favorites} 
+        onSelect={(text) => setResult(text)} 
+        onRemove={handleToggleFavorite} 
+      />
+    )}
+  </div>
+</div>
   </main>
 );
     
